@@ -413,6 +413,39 @@
   gap: 8px;
 }
 
+/* ── Modal tabs ── */
+.gotcha-modal-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--SmartThemeBorderColor, #555);
+  flex-shrink: 0;
+}
+
+.gotcha-modal-tab {
+  padding: 4px 10px;
+  font-size: 0.75rem;
+  border-radius: 20px;
+  border: 1px solid var(--SmartThemeBorderColor, #555);
+  background: transparent;
+  color: var(--SmartThemeBodyColor, #ccc);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  white-space: nowrap;
+}
+
+.gotcha-modal-tab:hover {
+  background: rgba(255,255,255,0.07);
+}
+
+.gotcha-modal-tab.active {
+  background: var(--SmartThemeQuoteColor, #f0a500);
+  border-color: transparent;
+  color: #111;
+  font-weight: 700;
+}
+
 .gotcha-modal-body::-webkit-scrollbar {
   width: 4px;
 }
