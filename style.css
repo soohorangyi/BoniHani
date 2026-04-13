@@ -1,6 +1,6 @@
 /* ===== Gotcha! — SillyTavern Extension ===== */
 
-#gotcha-panel {
+#gotcha-panel .inline-drawer-content {
   display: flex;
   flex-direction: column;
   gap: 12px;
