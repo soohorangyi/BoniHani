@@ -578,3 +578,168 @@
 body.gotcha-modal-open {
   overflow: hidden;
 }
+
+/* ── Section label & hint ── */
+#gotcha-panel .gotcha-section-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #6FCF97;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-bottom: -4px;
+}
+
+#gotcha-panel .gotcha-hint {
+  font-size: 0.68rem;
+  font-weight: 400;
+  opacity: 0.55;
+  text-transform: none;
+  letter-spacing: 0;
+  margin-left: 4px;
+}
+
+/* ── Name region / option row ── */
+#gotcha-panel .gotcha-option-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+#gotcha-panel .gotcha-option-row label {
+  font-size: 0.78rem;
+  opacity: 0.8;
+  white-space: nowrap;
+}
+
+#gotcha-panel .gotcha-option-row select {
+  flex: 1;
+  min-width: 120px;
+  font-size: 0.82rem;
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid #2FA08455;
+  background: var(--SmartThemeBlurTintColor, rgba(0,0,0,0.3));
+  color: var(--SmartThemeBodyColor, #ccc);
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+
+#gotcha-panel .gotcha-option-row select:focus {
+  outline: none;
+  border-color: #2FA084;
+}
+
+/* ── Mood sliders ── */
+#gotcha-panel .gotcha-mood-section {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid #2FA08430;
+  background: #2FA0840a;
+}
+
+#gotcha-panel .gotcha-slider-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#gotcha-panel .gotcha-slider-lbl {
+  font-size: 1rem;
+  flex-shrink: 0;
+  width: 22px;
+  text-align: center;
+}
+
+#gotcha-panel .gotcha-slider-row input[type="range"] {
+  flex: 1;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 4px;
+  border-radius: 2px;
+  background: linear-gradient(
+    to right,
+    #2FA084 0%,
+    #2FA084 calc((var(--val, 5) - 1) / 9 * 100%),
+    #2FA08430 calc((var(--val, 5) - 1) / 9 * 100%),
+    #2FA08430 100%
+  );
+  outline: none;
+  cursor: pointer;
+}
+
+#gotcha-panel .gotcha-slider-row input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #2FA084;
+  border: 2px solid #1F6F5F;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+}
+
+#gotcha-panel .gotcha-slider-row input[type="range"]::-webkit-slider-thumb:hover {
+  background: #6FCF97;
+  transform: scale(1.15);
+}
+
+#gotcha-panel .gotcha-slider-desc {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.72rem;
+  opacity: 0.6;
+  padding: 0 30px;
+  margin-top: -2px;
+  margin-bottom: 4px;
+}
+
+#gotcha-panel .gotcha-slider-val {
+  font-weight: 700;
+  color: #6FCF97;
+  opacity: 1;
+}
+
+/* ── History nav ── */
+#gotcha-panel .gotcha-hist-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-top: 1px solid #2FA08430;
+  background: #2FA08408;
+}
+
+#gotcha-panel .gotcha-hist-nav button {
+  background: none;
+  border: 1px solid #2FA08455;
+  border-radius: 6px;
+  color: var(--SmartThemeBodyColor, #ccc);
+  font-size: 0.78rem;
+  padding: 3px 10px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+#gotcha-panel .gotcha-hist-nav button:hover:not(:disabled) {
+  background: #2FA08422;
+  border-color: #2FA084;
+  color: #6FCF97;
+}
+
+#gotcha-panel .gotcha-hist-nav button:disabled {
+  opacity: 0.25;
+  cursor: not-allowed;
+}
+
+#gotcha-panel .gotcha-hist-count {
+  font-size: 0.75rem;
+  opacity: 0.6;
+  min-width: 40px;
+  text-align: center;
+}
