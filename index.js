@@ -364,12 +364,14 @@ function renderModalList() {
 
   list.html(items.map(item => `
     <div class="gotcha-saved-item" data-id="${item.id}">
-      <span class="gotcha-saved-tag">${escapeHtml(item.categoryLabel || item.category)}</span>
-      <span class="gotcha-saved-text">${escapeHtml(item.text)}</span>
-      <div class="gotcha-saved-item-btns">
-        <button class="gotcha-saved-copy" title="복사">📋</button>
-        <button class="gotcha-saved-del" data-id="${item.id}" title="삭제">✕</button>
+      <div class="gotcha-card-header">
+        <span class="gotcha-saved-tag">${escapeHtml(item.categoryLabel || item.category)}</span>
+        <div class="gotcha-saved-item-btns">
+          <button class="gotcha-saved-copy" title="복사">📋</button>
+          <button class="gotcha-saved-del" data-id="${item.id}" title="삭제">✕</button>
+        </div>
       </div>
+      <span class="gotcha-saved-text">${escapeHtml(item.text)}</span>
     </div>
   `).join(''));
 }
