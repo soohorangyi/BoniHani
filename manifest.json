@@ -1,0 +1,11 @@
+{
+  "display_name": "Gotcha!",
+  "name": "gotcha",
+  "version": "0.1.0",
+  "description": "AI-powered random generator for RP — genres, worlds, settings, characters and more.",
+  "author": "",
+  "homepageUrl": "",
+  "requires": [],
+  "js": "index.js",
+  "css": "style.css"
+}

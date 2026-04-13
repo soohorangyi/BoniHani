@@ -1,0 +1,331 @@
+/* ===== Gotcha! — SillyTavern Extension ===== */
+
+#gotcha-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px;
+  font-family: var(--mainFontFamily, sans-serif);
+  color: var(--SmartThemeBodyColor, #ccc);
+}
+
+/* ── Header ── */
+#gotcha-panel .gotcha-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#gotcha-panel .gotcha-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: var(--SmartThemeBodyColor, #eee);
+  flex: 1;
+}
+
+#gotcha-panel .gotcha-title span {
+  color: var(--SmartThemeQuoteColor, #f0a500);
+}
+
+/* ── API Profile selector ── */
+#gotcha-panel .gotcha-api-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+#gotcha-panel .gotcha-api-row label {
+  font-size: 0.78rem;
+  opacity: 0.7;
+  white-space: nowrap;
+}
+
+#gotcha-panel #gotcha-api-profile {
+  flex: 1;
+  min-width: 120px;
+  font-size: 0.82rem;
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--SmartThemeBorderColor, #555);
+  background: var(--SmartThemeBlurTintColor, rgba(0,0,0,0.3));
+  color: var(--SmartThemeBodyColor, #ccc);
+  cursor: pointer;
+}
+
+/* ── Category grid ── */
+#gotcha-panel .gotcha-categories {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+
+@media (max-width: 480px) {
+  #gotcha-panel .gotcha-categories {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+#gotcha-panel .gotcha-cat-btn {
+  padding: 7px 4px;
+  font-size: 0.78rem;
+  border-radius: 8px;
+  border: 1px solid var(--SmartThemeBorderColor, #555);
+  background: var(--SmartThemeBlurTintColor, rgba(0,0,0,0.25));
+  color: var(--SmartThemeBodyColor, #ccc);
+  cursor: pointer;
+  text-align: center;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  line-height: 1.3;
+}
+
+#gotcha-panel .gotcha-cat-btn:hover {
+  background: var(--SmartThemeQuoteColor, #f0a500);
+  color: #111;
+  border-color: transparent;
+}
+
+#gotcha-panel .gotcha-cat-btn.active {
+  background: var(--SmartThemeQuoteColor, #f0a500);
+  color: #111;
+  border-color: transparent;
+  font-weight: 700;
+}
+
+/* ── Custom prompt ── */
+#gotcha-panel .gotcha-custom-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+#gotcha-panel .gotcha-custom-row label {
+  font-size: 0.78rem;
+  opacity: 0.7;
+}
+
+#gotcha-panel #gotcha-custom-prompt {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 7px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--SmartThemeBorderColor, #555);
+  background: var(--SmartThemeBlurTintColor, rgba(0,0,0,0.25));
+  color: var(--SmartThemeBodyColor, #ccc);
+  font-size: 0.82rem;
+  resize: vertical;
+  min-height: 56px;
+  font-family: inherit;
+}
+
+#gotcha-panel #gotcha-custom-prompt::placeholder {
+  opacity: 0.45;
+}
+
+/* ── Generate button ── */
+#gotcha-panel #gotcha-generate-btn {
+  width: 100%;
+  padding: 10px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  border-radius: 10px;
+  border: none;
+  background: var(--SmartThemeQuoteColor, #f0a500);
+  color: #111;
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.1s;
+}
+
+#gotcha-panel #gotcha-generate-btn:hover {
+  opacity: 0.88;
+}
+
+#gotcha-panel #gotcha-generate-btn:active {
+  transform: scale(0.97);
+}
+
+#gotcha-panel #gotcha-generate-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ── Loading spinner ── */
+#gotcha-panel .gotcha-loading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.82rem;
+  opacity: 0.7;
+}
+
+#gotcha-panel .gotcha-spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--SmartThemeBorderColor, #555);
+  border-top-color: var(--SmartThemeQuoteColor, #f0a500);
+  border-radius: 50%;
+  animation: gotcha-spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes gotcha-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Result card ── */
+#gotcha-panel .gotcha-result-card {
+  border-radius: 10px;
+  border: 1px solid var(--SmartThemeBorderColor, #555);
+  background: var(--SmartThemeBlurTintColor, rgba(0,0,0,0.2));
+  overflow: hidden;
+}
+
+#gotcha-panel .gotcha-result-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: rgba(255,255,255,0.04);
+  border-bottom: 1px solid var(--SmartThemeBorderColor, #555);
+  font-size: 0.76rem;
+  opacity: 0.7;
+}
+
+#gotcha-panel .gotcha-result-actions {
+  display: flex;
+  gap: 6px;
+}
+
+#gotcha-panel .gotcha-result-actions button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: 4px;
+  font-size: 0.82rem;
+  color: var(--SmartThemeBodyColor, #ccc);
+  opacity: 0.7;
+  transition: opacity 0.15s, background 0.15s;
+}
+
+#gotcha-panel .gotcha-result-actions button:hover {
+  opacity: 1;
+  background: rgba(255,255,255,0.08);
+}
+
+#gotcha-panel .gotcha-result-body {
+  padding: 12px;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* ── Saved list ── */
+#gotcha-panel .gotcha-saved-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+#gotcha-panel .gotcha-saved-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.78rem;
+  opacity: 0.7;
+}
+
+#gotcha-panel .gotcha-saved-header button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.75rem;
+  color: var(--SmartThemeBodyColor, #ccc);
+  opacity: 0.6;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: opacity 0.15s, background 0.15s;
+}
+
+#gotcha-panel .gotcha-saved-header button:hover {
+  opacity: 1;
+  background: rgba(255,255,255,0.08);
+}
+
+#gotcha-panel .gotcha-saved-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+#gotcha-panel .gotcha-saved-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--SmartThemeBorderColor, #555);
+  background: var(--SmartThemeBlurTintColor, rgba(0,0,0,0.2));
+  font-size: 0.8rem;
+  line-height: 1.5;
+}
+
+#gotcha-panel .gotcha-saved-item .gotcha-saved-tag {
+  font-size: 0.7rem;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: var(--SmartThemeQuoteColor, #f0a500);
+  color: #111;
+  font-weight: 700;
+  white-space: nowrap;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+#gotcha-panel .gotcha-saved-item .gotcha-saved-text {
+  flex: 1;
+  word-break: break-word;
+}
+
+#gotcha-panel .gotcha-saved-item .gotcha-saved-del {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--SmartThemeBodyColor, #ccc);
+  opacity: 0.4;
+  font-size: 0.9rem;
+  padding: 0 2px;
+  line-height: 1;
+  flex-shrink: 0;
+  transition: opacity 0.15s;
+}
+
+#gotcha-panel .gotcha-saved-item .gotcha-saved-del:hover {
+  opacity: 1;
+}
+
+/* ── Empty state ── */
+#gotcha-panel .gotcha-empty {
+  text-align: center;
+  font-size: 0.8rem;
+  opacity: 0.45;
+  padding: 10px 0;
+}
+
+/* ── Scrollbar ── */
+#gotcha-panel .gotcha-saved-list::-webkit-scrollbar {
+  width: 4px;
+}
+#gotcha-panel .gotcha-saved-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+#gotcha-panel .gotcha-saved-list::-webkit-scrollbar-thumb {
+  background: var(--SmartThemeBorderColor, #555);
+  border-radius: 2px;
+}
