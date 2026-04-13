@@ -371,7 +371,7 @@ function renderModalList() {
           <button class="gotcha-saved-del" data-id="${item.id}" title="삭제">✕</button>
         </div>
       </div>
-      <span class="gotcha-saved-text">${escapeHtml(item.text)}</span>
+      <div class="gotcha-saved-text">${escapeHtml(item.text.trim())}</div>
     </div>
   `).join(''));
 }
