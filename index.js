@@ -262,23 +262,11 @@ function bindEvents() {
 // ── API Profile Helpers ───────────────────────────────────────
 function populateApiProfiles() {
   const select = $('#gotcha-api-profile');
+  refreshProfileOptions(select);
 
-  // ST stores connection profiles in power_user or as named presets
-  // We'll pull from the available API connections via context
-  try {
-    const context = getContext();
-    // Try to get connection presets if available
-    const profiles = getApiProfiles();
-    profiles.forEach(name => {
-      select.append(`<option value="${name}">${name}</option>`);
-    });
-
-    // Restore saved selection
-    const saved = extension_settings[EXT_NAME].apiProfile;
-    if (saved) select.val(saved);
-  } catch (e) {
-    // Silently fail — "현재 연결 사용" is always available
-  }
+  // Restore saved selection
+  const saved = extension_settings[EXT_NAME].apiProfile;
+  if (saved) select.val(saved);
 
   select.on('change', function () {
     extension_settings[EXT_NAME].apiProfile = $(this).val();
@@ -286,24 +274,43 @@ function populateApiProfiles() {
   });
 }
 
+function refreshProfileOptions(select) {
+  const current = select.val();
+  select.find('option:not([value=""])').remove();
+
+  const profiles = getApiProfiles();
+  profiles.forEach(({ name, label }) => {
+    select.append(`<option value="${name}">${label}</option>`);
+  });
+
+  if (current) select.val(current);
+}
+
 function getApiProfiles() {
-  // ST stores API connection profiles in various places depending on version.
-  // We check the most common locations.
+  // ST stores Connection Profiles in extension_settings.connectionManager.profiles
+  // Built-in since SillyTavern 1.12.6
   const profiles = [];
   try {
-    // Method 1: openai connection profiles (for Claude/GPT backends)
-    if (window.openai_connection_profiles) {
-      for (const key of Object.keys(window.openai_connection_profiles)) {
-        profiles.push(key);
-      }
-    }
-    // Method 2: power_user presets
-    if (window.power_user?.api_profiles) {
-      for (const p of window.power_user.api_profiles) {
-        if (p.name) profiles.push(p.name);
+    const cmProfiles = extension_settings?.connectionManager?.profiles;
+    if (Array.isArray(cmProfiles)) {
+      for (const p of cmProfiles) {
+        if (p?.name) profiles.push({ name: p.name, label: p.name });
       }
     }
   } catch (_) {}
+
+  // Fallback for older ST builds
+  if (profiles.length === 0) {
+    try {
+      const fallback = extension_settings?.connection_profiles;
+      if (Array.isArray(fallback)) {
+        for (const p of fallback) {
+          if (p?.name) profiles.push({ name: p.name, label: p.name });
+        }
+      }
+    } catch (_) {}
+  }
+
   return profiles;
 }
 
@@ -342,27 +349,45 @@ Output ONLY the result, no preamble.`;
 }
 
 async function callLLM(prompt) {
-  // Use ST's built-in generateRaw for the current active connection
-  // This respects whatever API the user has set up (Claude, GPT, local, etc.)
   const context = getContext();
-
-  // If a specific API profile is selected, we note it but generateRaw
-  // doesn't support per-call profile switching natively in all ST versions.
-  // We use the standard approach and inform the user if needed.
   const selectedProfile = extension_settings[EXT_NAME].apiProfile;
+  let previousProfile = null;
+
+  // If a specific profile is selected, temporarily switch to it before generating
   if (selectedProfile) {
-    // Advanced: attempt to temporarily switch connection
-    // For now we surface a note — full profile switching requires ST internals
-    console.log(`[Gotcha!] Using profile: ${selectedProfile} (best-effort)`);
+    try {
+      // Get current profile name so we can restore it after
+      const cmProfiles = extension_settings?.connectionManager?.profiles;
+      if (Array.isArray(cmProfiles)) {
+        previousProfile = cmProfiles.find(p => p.isActive)?.name ?? null;
+      }
+      // Apply the selected profile via ST's executeSlashCommandsWithOptions
+      // /profile command switches the active connection profile
+      if (context.executeSlashCommandsWithOptions) {
+        await context.executeSlashCommandsWithOptions(`/profile ${selectedProfile}`, { showOutput: false });
+      }
+    } catch (e) {
+      console.warn('[Gotcha!] Could not switch profile:', e);
+    }
   }
 
-  const result = await context.generateRaw(
-    prompt,
-    null,    // character (null = no character context)
-    false,   // quietToChat (don't append to chat)
-    false,   // skipWIAN
-    '',      // outerContext
-  );
+  let result;
+  try {
+    result = await context.generateRaw(
+      prompt,
+      null,    // character (null = no character context)
+      false,   // quietToChat (don't append to chat)
+      false,   // skipWIAN
+      '',      // outerContext
+    );
+  } finally {
+    // Restore previous profile after generation
+    if (selectedProfile && previousProfile && context.executeSlashCommandsWithOptions) {
+      try {
+        await context.executeSlashCommandsWithOptions(`/profile ${previousProfile}`, { showOutput: false });
+      } catch (_) {}
+    }
+  }
 
   return result || '';
 }
