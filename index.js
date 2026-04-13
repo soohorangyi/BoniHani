@@ -149,13 +149,12 @@ function buildPanelHtml() {
   `).join('');
 
   return `
-<div id="${PANEL_ID}">
-  <div class="inline-drawer">
-    <div class="inline-drawer-toggle inline-drawer-header">
-      <b>Gotcha!</b>
-      <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div>
-    </div>
-    <div class="inline-drawer-content">
+<div id="${PANEL_ID}" class="inline-drawer">
+  <div class="inline-drawer-toggle inline-drawer-header">
+    <b>Gotcha!</b>
+    <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div>
+  </div>
+  <div class="inline-drawer-content">
 
       <!-- API Profile -->
       <div class="gotcha-api-row">
@@ -198,7 +197,6 @@ function buildPanelHtml() {
         <div class="gotcha-saved-list" id="gotcha-saved-list"></div>
       </div>
 
-    </div>
   </div>
 </div>`;
 }
