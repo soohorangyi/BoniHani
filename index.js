@@ -14,8 +14,6 @@ import {
   renderExtensionTemplateAsync,
 } from '../../../extensions.js';
 
-import { oai_settings } from '../../../openai.js';
-
 // ── Constants ────────────────────────────────────────────────
 const EXT_NAME = 'gotcha';
 const PANEL_ID = 'gotcha-panel';
@@ -133,11 +131,48 @@ jQuery(async () => {
   // Populate API profiles
   populateApiProfiles();
 
-  // Restore saved list
-  renderSavedList();
+  // Register wand button
+  registerWandButton();
+  updateWandBadge();
 
   console.log('[Gotcha!] Extension loaded.');
 });
+
+// ── Modal HTML ────────────────────────────────────────────────
+function buildModalHtml() {
+  return `
+<div id="gotcha-modal-overlay" class="gotcha-modal-overlay">
+  <div class="gotcha-modal" role="dialog" aria-modal="true" aria-label="Gotcha! 저장 목록">
+    <div class="gotcha-modal-header">
+      <span class="gotcha-modal-title">🔖 저장 목록</span>
+      <div class="gotcha-modal-actions">
+        <button id="gotcha-modal-clear" title="전체 삭제">전체 삭제</button>
+        <button id="gotcha-modal-close" title="닫기">✕</button>
+      </div>
+    </div>
+    <div class="gotcha-modal-body">
+      <div id="gotcha-modal-list"></div>
+    </div>
+  </div>
+</div>`;
+}
+
+// ── Wand Button ───────────────────────────────────────────────
+function registerWandButton() {
+  // ST의 마법봉(#extensionsMenuButton) 드롭다운에 항목 추가
+  const wandHtml = `
+    <div id="gotcha-wand-btn" class="list-group-item" title="Gotcha! 저장 목록">
+      <span>🔖</span>
+      <span>Gotcha! 저장 목록</span>
+    </div>`;
+
+  // ST wand menu is #extensionsMenu (the dropdown list inside #extensionsMenuButton)
+  $('#extensionsMenu').append(wandHtml);
+
+  $(document).on('click', '#gotcha-wand-btn', () => {
+    openSavedModal();
+  });
+}
 
 // ── Build HTML ────────────────────────────────────────────────
 function buildPanelHtml() {
@@ -188,15 +223,6 @@ function buildPanelHtml() {
       <!-- Result area -->
       <div id="gotcha-result-area"></div>
 
-      <!-- Saved items -->
-      <div class="gotcha-saved-section" id="gotcha-saved-section" style="display:none;">
-        <div class="gotcha-saved-header">
-          <span>저장된 항목</span>
-          <button id="gotcha-clear-saved">전체 삭제</button>
-        </div>
-        <div class="gotcha-saved-list" id="gotcha-saved-list"></div>
-      </div>
-
   </div>
 </div>`;
 }
@@ -241,22 +267,95 @@ function bindEvents() {
     saveResult(selectedCategory, lastResult);
   });
 
-  // Clear all saved
-  $(document).on('click', '#gotcha-clear-saved', () => {
-    if (!confirm('저장된 항목을 모두 삭제할까요?')) return;
-    extension_settings[EXT_NAME].savedItems = [];
-    saveSettingsDebounced();
-    renderSavedList();
-  });
-
-  // Delete individual saved item
+  // Delete individual saved item (modal)
   $(document).on('click', '.gotcha-saved-del', function () {
     const id = $(this).data('id');
     const items = extension_settings[EXT_NAME].savedItems;
     extension_settings[EXT_NAME].savedItems = items.filter(i => i.id !== id);
     saveSettingsDebounced();
-    renderSavedList();
+    renderModalList();
+    updateWandBadge();
   });
+
+  // Copy item text (modal)
+  $(document).on('click', '.gotcha-saved-copy', function () {
+    const text = $(this).closest('.gotcha-saved-item').find('.gotcha-saved-text').text();
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = $(this);
+      btn.text('✅');
+      setTimeout(() => btn.text('📋'), 1200);
+    });
+  });
+
+  // Close modal on overlay click
+  $(document).on('click', '#gotcha-modal-overlay', function (e) {
+    if ($(e.target).is('#gotcha-modal-overlay')) closeModal();
+  });
+
+  // Close modal button
+  $(document).on('click', '#gotcha-modal-close', closeModal);
+
+  // Clear all (modal)
+  $(document).on('click', '#gotcha-modal-clear', () => {
+    if (!confirm('저장된 항목을 모두 삭제할까요?')) return;
+    extension_settings[EXT_NAME].savedItems = [];
+    saveSettingsDebounced();
+    renderModalList();
+    updateWandBadge();
+  });
+
+  // ESC to close modal
+  $(document).on('keydown.gotcha-modal', (e) => {
+    if (e.key === 'Escape') closeModal();
+  });
+}
+
+// ── Modal Open / Close ────────────────────────────────────────
+function openSavedModal() {
+  // Inject modal if not present
+  if (!$('#gotcha-modal-overlay').length) {
+    $('body').append(buildModalHtml());
+  }
+  renderModalList();
+  $('#gotcha-modal-overlay').addClass('active');
+  $('body').addClass('gotcha-modal-open');
+}
+
+function closeModal() {
+  $('#gotcha-modal-overlay').removeClass('active');
+  $('body').removeClass('gotcha-modal-open');
+}
+
+function renderModalList() {
+  const items = extension_settings[EXT_NAME].savedItems;
+  const list = $('#gotcha-modal-list');
+
+  if (!items || items.length === 0) {
+    list.html('<div class="gotcha-modal-empty">저장된 항목이 없습니다.</div>');
+    return;
+  }
+
+  list.html(items.map(item => `
+    <div class="gotcha-saved-item" data-id="${item.id}">
+      <span class="gotcha-saved-tag">${escapeHtml(item.categoryLabel || item.category)}</span>
+      <span class="gotcha-saved-text">${escapeHtml(item.text)}</span>
+      <div class="gotcha-saved-item-btns">
+        <button class="gotcha-saved-copy" title="복사">📋</button>
+        <button class="gotcha-saved-del" data-id="${item.id}" title="삭제">✕</button>
+      </div>
+    </div>
+  `).join(''));
+}
+
+function updateWandBadge() {
+  const count = (extension_settings[EXT_NAME].savedItems || []).length;
+  const badge = $('#gotcha-wand-badge');
+  if (count > 0) {
+    if (badge.length) badge.text(count);
+    else $('#gotcha-wand-btn span:first').after(`<span id="gotcha-wand-badge" class="gotcha-wand-badge">${count}</span>`);
+  } else {
+    badge.remove();
+  }
 }
 
 // ── API Profile Helpers ───────────────────────────────────────
@@ -430,7 +529,8 @@ function saveResult(category, text) {
     settings.savedItems = settings.savedItems.slice(0, 50);
   }
   saveSettingsDebounced();
-  renderSavedList();
+  if ($('#gotcha-modal-overlay').hasClass('active')) renderModalList();
+  updateWandBadge();
   toastr.success('저장되었습니다!', 'Gotcha!');
 
   // Flash the save button
@@ -439,25 +539,7 @@ function saveResult(category, text) {
   setTimeout(() => btn.text('🔖'), 1200);
 }
 
-function renderSavedList() {
-  const items = extension_settings[EXT_NAME].savedItems;
-  const section = $('#gotcha-saved-section');
-  const list = $('#gotcha-saved-list');
 
-  if (!items || items.length === 0) {
-    section.hide();
-    return;
-  }
-
-  section.show();
-  list.html(items.map(item => `
-    <div class="gotcha-saved-item">
-      <span class="gotcha-saved-tag">${escapeHtml(item.categoryLabel || item.category)}</span>
-      <span class="gotcha-saved-text">${escapeHtml(item.text)}</span>
-      <button class="gotcha-saved-del" data-id="${item.id}" title="삭제">✕</button>
-    </div>
-  `).join(''));
-}
 
 function escapeHtml(str) {
   return String(str)
