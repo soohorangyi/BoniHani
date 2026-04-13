@@ -109,6 +109,7 @@ Output ONLY the relationship description, nothing else.`,
 let selectedCategory = CATEGORIES[0];
 let isGenerating = false;
 let lastResult = null;
+let activeModalTab = 'all';
 
 // ── Init ──────────────────────────────────────────────────────
 jQuery(async () => {
@@ -140,6 +141,12 @@ jQuery(async () => {
 
 // ── Modal HTML ────────────────────────────────────────────────
 function buildModalHtml() {
+  // Build tab buttons from CATEGORIES (excluding 'custom')
+  const tabButtons = CATEGORIES
+    .filter(c => c.id !== 'custom')
+    .map(c => `<button class="gotcha-modal-tab" data-tab="${c.id}">${c.label}</button>`)
+    .join('');
+
   return `
 <div id="gotcha-modal-overlay" class="gotcha-modal-overlay">
   <div class="gotcha-modal" role="dialog" aria-modal="true" aria-label="Gotcha! 저장 목록">
@@ -149,6 +156,11 @@ function buildModalHtml() {
         <button id="gotcha-modal-clear" title="전체 삭제">전체 삭제</button>
         <button id="gotcha-modal-close" title="닫기">✕</button>
       </div>
+    </div>
+    <div class="gotcha-modal-tabs">
+      <button class="gotcha-modal-tab active" data-tab="all">전체</button>
+      ${tabButtons}
+      <button class="gotcha-modal-tab" data-tab="custom">✨ 직접 입력</button>
     </div>
     <div class="gotcha-modal-body">
       <div id="gotcha-modal-list"></div>
@@ -161,9 +173,9 @@ function buildModalHtml() {
 function registerWandButton() {
   // ST의 마법봉(#extensionsMenuButton) 드롭다운에 항목 추가
   const wandHtml = `
-    <div id="gotcha-wand-btn" class="list-group-item" title="Gotcha! 저장 목록">
-      <span>🔖</span>
-      <span>Gotcha! 저장 목록</span>
+    <div id="gotcha-wand-btn" class="list-group-item" title="Gotcha!">
+      <span>🎲</span>
+      <span>Gotcha!</span>
     </div>`;
 
   // ST wand menu is #extensionsMenu (the dropdown list inside #extensionsMenuButton)
@@ -308,6 +320,14 @@ function bindEvents() {
   $(document).on('keydown.gotcha-modal', (e) => {
     if (e.key === 'Escape') closeModal();
   });
+
+  // Modal tab switching
+  $(document).on('click', '.gotcha-modal-tab', function () {
+    activeModalTab = $(this).data('tab');
+    $('.gotcha-modal-tab').removeClass('active');
+    $(this).addClass('active');
+    renderModalList();
+  });
 }
 
 // ── Modal Open / Close ────────────────────────────────────────
@@ -316,6 +336,10 @@ function openSavedModal() {
   if (!$('#gotcha-modal-overlay').length) {
     $('body').append(buildModalHtml());
   }
+  // Sync active tab UI
+  activeModalTab = 'all';
+  $('.gotcha-modal-tab').removeClass('active');
+  $(`.gotcha-modal-tab[data-tab="all"]`).addClass('active');
   renderModalList();
   $('#gotcha-modal-overlay').addClass('active');
   $('body').addClass('gotcha-modal-open');
@@ -327,7 +351,10 @@ function closeModal() {
 }
 
 function renderModalList() {
-  const items = extension_settings[EXT_NAME].savedItems;
+  const allItems = extension_settings[EXT_NAME].savedItems;
+  const items = activeModalTab === 'all'
+    ? allItems
+    : allItems.filter(i => i.category === activeModalTab);
   const list = $('#gotcha-modal-list');
 
   if (!items || items.length === 0) {
@@ -348,14 +375,7 @@ function renderModalList() {
 }
 
 function updateWandBadge() {
-  const count = (extension_settings[EXT_NAME].savedItems || []).length;
-  const badge = $('#gotcha-wand-badge');
-  if (count > 0) {
-    if (badge.length) badge.text(count);
-    else $('#gotcha-wand-btn span:first').after(`<span id="gotcha-wand-badge" class="gotcha-wand-badge">${count}</span>`);
-  } else {
-    badge.remove();
-  }
+  // Badge intentionally removed — wand menu shows "Gotcha!" only
 }
 
 // ── API Profile Helpers ───────────────────────────────────────
