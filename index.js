@@ -173,7 +173,7 @@ function buildPanelHtml() {
 <div id="${PANEL_ID}" class="inline-drawer">
   <div class="inline-drawer-toggle inline-drawer-header">
     <b>Gotcha!</b>
-    <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div>
+    <div class="inline-drawer-icon fa-solid fa-circle-chevron-down up"></div>
   </div>
   <div class="inline-drawer-content">
 
@@ -582,7 +582,13 @@ async function callLLM(prompt) {
       try { await context.executeSlashCommandsWithOptions(`/profile ${previousProfile}`, { showOutput: false }); } catch (_) {}
     }
   }
-  return result || '';
+  return stripInjectedTags(result || '');
+}
+
+// ── Strip tags injected by other extensions ───────────────────
+function stripInjectedTags(text) {
+  // Remove any XML-style tags that other extensions inject (e.g. <phone_trigger ...>...</phone_trigger>)
+  return text.replace(/<[a-z_][a-z0-9_]*(?:\s[^>]*)?>[\s\S]*?<\/[a-z_][a-z0-9_]*>/gi, '').trim();
 }
 
 // ── History ───────────────────────────────────────────────────
