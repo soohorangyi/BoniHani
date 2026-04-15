@@ -421,9 +421,25 @@ function openSavedModal() {
   $('.gotcha-modal-tab').removeClass('active');
   $(`.gotcha-modal-tab[data-tab="all"]`).addClass('active');
   renderModalList();
-  $('#gotcha-modal-overlay').addClass('active');
+
+  // 오버레이를 document 전체 높이로 펼치고
+  const $overlay = $('#gotcha-modal-overlay');
+  $overlay.addClass('active');
   $('body').addClass('gotcha-modal-open');
+
+  // 모달을 현재 보이는 화면 중앙에 JS로 직접 위치시킴
+  positionModal();
 }
+
+function positionModal() {
+  const $modal   = $('.gotcha-modal');
+  const scrollY  = window.scrollY || document.documentElement.scrollTop || 0;
+  const vpH      = window.innerHeight;
+  const modalH   = $modal.outerHeight() || 400;
+  const top      = scrollY + (vpH - modalH) / 2;
+  $modal.css('top', Math.max(scrollY + 8, top) + 'px');
+}
+
 function closeModal() {
   $('#gotcha-modal-overlay').removeClass('active');
   $('body').removeClass('gotcha-modal-open');
