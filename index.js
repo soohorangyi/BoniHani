@@ -97,17 +97,57 @@ Respond in Korean. Output ONLY the relationship description, nothing else.`,
 ];
 
 // ── Name region list ──────────────────────────────────────────
+// sub 배열이 있으면 2단계 선택 UI를 표시. value가 없으면 하위 선택 필요.
 const NAME_REGIONS = [
-  { value: '',                                               label: '🎲 랜덤 (제한 없음)' },
-  { value: '한국/일본/중국 동아시아',                        label: '🏯 동아시아' },
-  { value: '서유럽 (영국, 프랑스, 독일, 이탈리아)',          label: '⚔️ 서유럽' },
-  { value: '북유럽 바이킹 (노르웨이, 스웨덴, 아이슬란드)',   label: '🪓 북유럽/바이킹' },
-  { value: '동유럽 슬라브 (러시아, 폴란드, 체코)',           label: '🌲 슬라브/동유럽' },
-  { value: '중동 아랍 (아랍어, 페르시아, 터키)',             label: '🌙 중동/아랍' },
-  { value: '남미 라틴 (스페인어, 포르투갈어)',               label: '🌺 라틴/남미' },
-  { value: '아프리카 전통 이름',                             label: '🌍 아프리카' },
-  { value: '고대 그리스/로마',                               label: '🏛️ 고대 그리스/로마' },
-  { value: '완전히 창작된 판타지 언어',                      label: '✨ 창작 판타지어' },
+  { id: 'random',       value: '',  label: '🎲 랜덤 (제한 없음)' },
+  { id: 'east_asia',    label: '🏯 동아시아', sub: [
+    { value: '한국 (Korean)',                          label: '🇰🇷 한국' },
+    { value: '일본 (Japanese)',                        label: '🇯🇵 일본' },
+    { value: '중국 (Chinese)',                         label: '🇨🇳 중국' },
+    { value: '동아시아 혼합 (한국/일본/중국)',          label: '🏯 혼합' },
+  ]},
+  { id: 'west_europe',  label: '⚔️ 서유럽', sub: [
+    { value: '영어권 (English-speaking: 영국, 아일랜드, 호주 등)',  label: '🇬🇧 영어권' },
+    { value: '북미 (American/Canadian English)',                    label: '🌎 북미' },
+    { value: '프랑스 (French)',                                     label: '🇫🇷 프랑스' },
+    { value: '독일/오스트리아 (German)',                            label: '🇩🇪 독일/오스트리아' },
+    { value: '이탈리아 (Italian)',                                  label: '🇮🇹 이탈리아' },
+    { value: '스페인 (Spanish)',                                    label: '🇪🇸 스페인' },
+    { value: '서유럽 혼합 (영국, 프랑스, 독일, 이탈리아 등)',       label: '⚔️ 혼합' },
+  ]},
+  { id: 'north_europe', label: '🪓 북유럽/바이킹', sub: [
+    { value: '노르웨이 (Norwegian)',                    label: '🇳🇴 노르웨이' },
+    { value: '스웨덴 (Swedish)',                        label: '🇸🇪 스웨덴' },
+    { value: '덴마크 (Danish)',                         label: '🇩🇰 덴마크' },
+    { value: '핀란드 (Finnish)',                        label: '🇫🇮 핀란드' },
+    { value: '아이슬란드/바이킹 (Icelandic/Old Norse)', label: '🪓 아이슬란드/바이킹' },
+    { value: '북유럽 혼합 (노르웨이, 스웨덴, 아이슬란드 등)', label: '🪓 혼합' },
+  ]},
+  { id: 'east_europe',  label: '🌲 슬라브/동유럽', sub: [
+    { value: '러시아 (Russian)',              label: '🇷🇺 러시아' },
+    { value: '폴란드 (Polish)',               label: '🇵🇱 폴란드' },
+    { value: '체코/슬로바키아 (Czech/Slovak)', label: '🇨🇿 체코/슬로바키아' },
+    { value: '동유럽 슬라브 혼합 (러시아, 폴란드, 체코 등)', label: '🌲 혼합' },
+  ]},
+  { id: 'middle_east',  label: '🌙 중동/아랍', sub: [
+    { value: '아랍 (Arabic)',                  label: '🌙 아랍' },
+    { value: '페르시아/이란 (Persian/Iranian)', label: '🇮🇷 페르시아/이란' },
+    { value: '터키 (Turkish)',                 label: '🇹🇷 터키' },
+    { value: '중동 혼합 (아랍어, 페르시아, 터키 등)', label: '🌙 혼합' },
+  ]},
+  { id: 'latin',        label: '🌺 라틴/남미', sub: [
+    { value: '멕시코/중미 (Mexican/Central American Spanish)', label: '🇲🇽 멕시코/중미' },
+    { value: '브라질 (Brazilian Portuguese)',                  label: '🇧🇷 브라질' },
+    { value: '아르헨티나/칠레 (Argentine/Chilean)',            label: '🇦🇷 아르헨티나/칠레' },
+    { value: '라틴 혼합 (스페인어권, 포르투갈어권 남미)',       label: '🌺 혼합' },
+  ]},
+  { id: 'africa',       label: '🌍 아프리카', sub: [
+    { value: '서아프리카 (West African — 나이지리아, 가나 등)',   label: '🌍 서아프리카' },
+    { value: '동아프리카 (East African — 케냐, 에티오피아 등)',   label: '🌍 동아프리카' },
+    { value: '아프리카 혼합 (African traditional names)',         label: '🌍 혼합' },
+  ]},
+  { id: 'ancient',      value: '고대 그리스/로마 (Ancient Greek/Roman)', label: '🏛️ 고대 그리스/로마' },
+  { id: 'fantasy',      value: '완전히 창작된 판타지 언어 (invented fantasy language)', label: '✨ 창작 판타지어' },
 ];
 
 // ── Mood hint builder ─────────────────────────────────────────
@@ -145,7 +185,7 @@ jQuery(async () => {
 
   // restore saved name region
   const savedRegion = extension_settings[EXT_NAME].nameRegion;
-  if (savedRegion) $('#gotcha-name-region').val(savedRegion);
+  restoreRegionSelection(savedRegion);
 
   registerWandButton();
   updateWandBadge();
@@ -164,7 +204,7 @@ function buildPanelHtml() {
   `).join('');
 
   const regionOptions = NAME_REGIONS.map(r =>
-    `<option value="${escapeHtml(r.value)}">${r.label}</option>`
+    `<option value="${escapeHtml(r.value ?? '')}" data-id="${r.id}" data-has-sub="${r.sub ? 'true' : 'false'}">${r.label}</option>`
   ).join('');
 
   const s = extension_settings[EXT_NAME];
@@ -195,8 +235,9 @@ function buildPanelHtml() {
 
     <!-- Name region (charname 선택 시 표시) -->
     <div class="gotcha-option-row" id="gotcha-name-region-row" style="display:none;">
-      <label for="gotcha-name-region">🌐 이름 지역/문화</label>
+      <label>🌐 이름 지역/문화</label>
       <select id="gotcha-name-region">${regionOptions}</select>
+      <select id="gotcha-name-subregion" style="display:none;margin-top:6px;"></select>
     </div>
 
     <!-- Mood sliders -->
@@ -347,8 +388,29 @@ function bindEvents() {
     saveSettingsDebounced();
   });
 
-  // Name region
+  // Name region (1단계)
   $(document).on('change', '#gotcha-name-region', function () {
+    const regionId = $(this).find('option:selected').data('id') ||
+                     NAME_REGIONS.find(r => (r.value ?? '') === $(this).val())?.id;
+    const region   = NAME_REGIONS.find(r => r.id === regionId);
+    if (region && region.sub) {
+      // 하위 선택지 표시
+      const subSel = $('#gotcha-name-subregion');
+      subSel.empty().append('<option value="">-- 세부 지역 선택 --</option>');
+      region.sub.forEach(s => subSel.append(`<option value="${escapeHtml(s.value)}">${s.label}</option>`));
+      subSel.show();
+      // 상위만으로는 저장 안 함
+      extension_settings[EXT_NAME].nameRegion = '';
+      saveSettingsDebounced();
+    } else {
+      $('#gotcha-name-subregion').hide();
+      extension_settings[EXT_NAME].nameRegion = $(this).val();
+      saveSettingsDebounced();
+    }
+  });
+
+  // Name subregion (2단계)
+  $(document).on('change', '#gotcha-name-subregion', function () {
     extension_settings[EXT_NAME].nameRegion = $(this).val();
     saveSettingsDebounced();
   });
@@ -583,6 +645,34 @@ async function callLLM(prompt) {
     }
   }
   return stripInjectedTags(result || '');
+}
+
+// ── Restore region selection ─────────────────────────────────
+function restoreRegionSelection(savedValue) {
+  if (!savedValue) return;
+  // 상위 지역에 value가 직접 있는 경우 (랜덤, 고대, 판타지 등)
+  const direct = NAME_REGIONS.find(r => r.value === savedValue);
+  if (direct) {
+    $('#gotcha-name-region').val(savedValue);
+    return;
+  }
+  // 하위 지역인 경우 — 상위를 찾아서 선택 후 sub 표시
+  for (const region of NAME_REGIONS) {
+    if (!region.sub) continue;
+    const subMatch = region.sub.find(s => s.value === savedValue);
+    if (subMatch) {
+      // 상위 select에서 이 region을 선택
+      $('#gotcha-name-region').find('option').each(function () {
+        if ($(this).text() === region.label) $(this).prop('selected', true);
+      });
+      // 하위 select 빌드 후 값 선택
+      const subSel = $('#gotcha-name-subregion');
+      subSel.empty().append('<option value="">-- 세부 지역 선택 --</option>');
+      region.sub.forEach(s => subSel.append(`<option value="${escapeHtml(s.value)}">${s.label}</option>`));
+      subSel.val(savedValue).show();
+      return;
+    }
+  }
 }
 
 // ── Strip tags injected by other extensions ───────────────────
