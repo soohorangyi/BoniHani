@@ -353,23 +353,26 @@
   left: 0;
   right: 0;
   bottom: 0;
-  width: 100%;
-  height: 100%;
   z-index: 10000;
   background: rgba(0, 0, 0, 0.6);
+  /* flexbox centering — works reliably on mobile */
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
   box-sizing: border-box;
+  -webkit-overflow-scrolling: touch;
 }
 
 .gotcha-modal-overlay.active {
-  display: block;
+  display: flex;
 }
 
 .gotcha-modal {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: calc(100% - 32px);
+  position: relative;
+  top: auto;
+  left: auto;
+  transform: none;
+  width: 100%;
   max-width: 520px;
   max-height: 80vh;
   display: flex;
@@ -379,6 +382,8 @@
   background: var(--SmartThemeBlurTintColor, #1a1a1a);
   box-shadow: 0 8px 40px rgba(31, 111, 95, 0.3);
   overflow: hidden;
+  /* prevent shrinking on small screens */
+  flex-shrink: 0;
 }
 
 .gotcha-modal-header {
